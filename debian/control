@@ -1,0 +1,12 @@
+Source: ros-melodic-s3-file-uploader
+Section: misc
+Priority: optional
+Maintainer: AWS RoboMaker <ros-contributions@amazon.com>
+Build-Depends: debhelper (>= 9.0.0), google-mock, libboost-all-dev, libgtest-dev, ros-melodic-actionlib, ros-melodic-actionlib-msgs, ros-melodic-aws-common, ros-melodic-aws-ros1-common, ros-melodic-catkin, ros-melodic-file-uploader-msgs, ros-melodic-roscpp, ros-melodic-rostest
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-melodic-s3-file-uploader
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-all-dev, ros-melodic-actionlib, ros-melodic-actionlib-msgs, ros-melodic-aws-common, ros-melodic-aws-ros1-common, ros-melodic-file-uploader-msgs, ros-melodic-roscpp
+Description: Package with a node that facilitates the uploading of files to Amazon S3
