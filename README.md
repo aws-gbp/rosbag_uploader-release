@@ -1,87 +1,87 @@
-## Amazon S3 Uploader
+## Rosbag Cloud Recorders
 
-This package contains a node that facilitates the uploading of files to Amazon S3.
-The `s3_file_uploader` node provides an action interface for uploading a set of files to Amazon S3.
-For more information on actions see the [`actionlib` documentation](http://wiki.ros.org/actionlib).
-Examples for using the UploadFiles action server can be found below.
-The action server can take one upload request at a time.
-If the uploader is currently working on an upload request it will reject any new requests.
+This repository contains ROS nodes for recording rosbags and uploading them to Amazon S3.
 
-### AWS Credentials
+There are three nodes under this repository: the `duration_recorder`, the `rolling_recorder`, and the `s3_file_uploader`. See the READMEs under the `rosbag_cloud_recorders` and `s3_uploader` directories for more details.
+- `duration_recorder` - This node provides an action interface to record rosbags for a specified duration. Once that duration is complete the rosbag files are uploaded to S3.
+- `rolling_recorder` - This node provides an action interface for uploading the past *x* minutes of rosbag files.
+- `s3_file_uploader` - This node is in the `s3_file_uploader` package and provides an action interface for uploading a set of files to S3.
 
-You will need to create an AWS Account and configure the credentials to be able to communicate with AWS services.
-You may find [AWS Configuration and Credential Files] helpful.
+More details on the `duration_recorder` and `rolling_recorder` can be found in the `rosbag_cloud_recorders` README. More details on the `s3_file_uploader` can be found in the `s3_file_uploader` README.
 
-This node will require the following AWS account IAM role permissions:
-- `s3:PutObject`
-for the bucket specified in the config file.
+**Amazon S3 Summary**: Amazon Simple Storage Service (Amazon S3) is an object storage service that offers industry-leading scalability, data availability, security, and performance. This means customers of all sizes and industries can use it to store and protect any amount of data for a range of use cases, such as websites, mobile applications, backup and restore, archive, enterprise applications, IoT devices, and big data analytics. Amazon S3 provides easy-to-use management features so you can organize your data and configure finely-tuned access controls to meet your specific business, organizational, and compliance requirements. Amazon S3 is designed for 99.999999999% (11 9's) of durability, and stores data for millions of applications for companies all around the world.
 
+### Build status
 
-## Usage
-
-### Resource Setup
-
-- [Create a bucket](https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html) in Amazon S3.
-
-### Running the node
-
-- Build the `s3_file_uploader` package following the instructions in the main README.
-- Configure AWS credentials.
-- Change the node configuration with the S3 Bucket that files should be uploaded to.
-Note that this bucket must be in the same region as in the node configuration.
-- Launch the node with
-
-        roslaunch s3_file_uploader s3_file_uploader.launch s3_bucket:=<BUCKET_NAME>
-
-### Simple Upload File Test
-
-A simple example of an action client to interact with this node is provided.
-Create a dummy file to use an example to upload:
-
-        echo "Hello World!" > /tmp/hello_world.txt
-
-Then source the ROS workspace, and the example client can be run with `python examples/s3_file_uploader_client.py`.
-The action server can also be invoked via the `rostopic` command line tool:
-
-        rostopic pub /s3_file_uploader/UploadFiles/goal file_uploader_msgs/UploadFilesActionGoal "{goal: { files:['/tmp/hello_world.txt'], upload_location: 'rosbags/test' } }"
-
-After the action is completed, the contents of `/tmp/hello_world.txt` wil be available at `s3://<BUCKET_NAME>/rosbags/test/hello_world.txt`.
+[![Actions Status](https://github.com/aws-robotics/rosbag-uploader-ros1/workflows/build-test/badge.svg)](https://github.com/aws-robotics/rosbag-uploader-ros1/actions)
 
 
-## `s3_file_uploader` node
+## License
 
-### Launch and Configuration File Parameters
+The source code is released under [Apache 2.0].
 
-| Name | Type | Description | Default Value |
-| ---- | ---- | ----------- | ------------- |
-| `s3_bucket` | string | The S3 bucket where files should be uploaded to | N/A (must be specified) |
-| `enable_encryption` (configuration file parameter only) | boolean | Enable server-side encryption for uploaded files | false |
-| `spinner_thread_count` (configuration file parameter only) | int | The number of threads for ros::MultiThreadedSpinner to use | 2 |
-| `aws_client_configuration.region` (configuration file parameter only) | string | The AWS region to use (must match the region of the S3 bucket) | us-west-2 |
-
-### Actions
-
-**Action Name**: ~/UploadFiles
-
-**Goal**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `files` | string[] | A list of absolute paths to files to be uploaded (Note that these paths must be accessible by the `s3_file_uploader` node) |
-| `upload_location` | string | The S3 Key prefix of the files to be uploaded |
-
-**Result**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `result_code` | uint16 | The error code returned from S3 (The enum list can be found [here](https://sdk.amazonaws.com/cpp/api/LATEST/_s3_errors_8h_source.html)) |
-| `files_uploaded` | string[] | The list of files that were successfully uploaded |
-
-*Note* goals also have a message field that will contain more details on the result of the action
-
-**Feedback**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `num_uploaded` | uint16 | The number of files that have been uploaded from this request so far |
-| `num_remaining` | uint16 | The number of files that are remaining in this upload request |
+**Author**: AWS RoboMaker<br/>
+**Affiliation**: [Amazon Web Services (AWS)]<br/>
+**Maintainer**: AWS RoboMaker, ros-contributions@amazon.com
 
 
-[AWS Configuration and Credential Files]: https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
+## Installation
+
+### Building from Source
+
+To build from source you'll need to create a new workspace, clone and checkout the `release-latest` branch of this repository, install all the dependencies, and compile. If you need the latest development features you can clone from the `master` branch instead of the latest release branch. While we guarantee the release branches are stable, __the `master` should be considered to have an unstable build__ due to ongoing development.
+
+- Install build tool: please refer to `colcon` [installation guide](https://colcon.readthedocs.io/en/released/user/installation.html)
+
+- Create a ROS workspace and a source directory
+
+        mkdir -p ~/ros-workspace/src
+
+- Clone the package into the source directory . 
+
+        cd ~/ros-workspace/src
+        git clone https://github.com/aws-robotics/rosbag-uploader-ros1.git
+
+- Install dependencies
+
+        cd ~/ros-workspace 
+        sudo apt-get update && rosdep update
+        rosdep install --from-paths src --ignore-src -r -y
+
+_Note: If building the master branch instead of a release branch you may need to also checkout and build the master branches of the packages this package depends on._
+
+- Build the packages
+
+        cd ~/ros-workspace && colcon build
+
+- Configure ROS library Path
+
+        source ~/ros-workspace/install/setup.bash
+
+### Running Tests
+
+- Build with
+
+        colcon build --cmake-targets tests
+
+- Then run tests
+
+        colcon test
+        colcon test-result --all
+
+### Running
+
+Instructions for running the nodes in this repository can be found in the READMEs for `rosbag_cloud_recorders` and `s3_file_uploader` packages.
+
+
+## Bugs & Feature Requests
+
+Please contact the team directly if you would like to request a feature.
+
+Please report bugs in [Issue Tracker].
+
+
+[Amazon Web Services (AWS)]: https://aws.amazon.com/
+[Apache 2.0]: https://aws.amazon.com/apache-2-0/
+[Issue Tracker]: https://github.com/aws-robotics/rosbag-uploader-ros1/issues
+[ROS]: http://www.ros.org
