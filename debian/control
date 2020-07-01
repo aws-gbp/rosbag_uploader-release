@@ -1,0 +1,12 @@
+Source: ros-kinetic-s3-common
+Section: misc
+Priority: optional
+Maintainer: AWS RoboMaker <ros-contributions@amazon.com>
+Build-Depends: debhelper (>= 9.0.0), cmake, google-mock, libboost-all-dev, ros-kinetic-aws-common, ros-kinetic-catkin
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-kinetic-s3-common
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-all-dev, ros-kinetic-aws-common
+Description: Common utilities for interacting with AWS S3
