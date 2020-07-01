@@ -1,121 +1,87 @@
 ## Rosbag Cloud Recorders
 
-This package contains nodes that facilitate the recording of rosbag files.
-The `rolling_recorder` node provides an action interface for uploading the past *x* minutes of rosbag files.
-The `duration_recorder` node provides an action interface to record rosbags for a specified duration.
-Once that duration is complete the rosbag files are uploaded to S3.
-For more information on actions see the [`actionlib` documentation](http://wiki.ros.org/actionlib).
-Examples for using the action servers can be found below.
-The action servers can only take one request at a time.
-If the node is currently working on a request it will reject any new requests.
+This repository contains ROS nodes for recording rosbags and uploading them to Amazon S3.
 
-### AWS Credentials
+There are three nodes under this repository: the `duration_recorder`, the `rolling_recorder`, and the `s3_file_uploader`. See the READMEs under the `rosbag_cloud_recorders` and `s3_uploader` directories for more details.
+- `duration_recorder` - This node provides an action interface to record rosbags for a specified duration. Once that duration is complete the rosbag files are uploaded to S3.
+- `rolling_recorder` - This node provides an action interface for uploading the past *x* minutes of rosbag files.
+- `s3_file_uploader` - This node is in the `s3_file_uploader` package and provides an action interface for uploading a set of files to S3.
 
-You will need to create an AWS Account and configure the credentials to be able to communicate with AWS services.
-You may find [AWS Configuration and Credential Files] helpful.
+More details on the `duration_recorder` and `rolling_recorder` can be found in the `rosbag_cloud_recorders` README. More details on the `s3_file_uploader` can be found in the `s3_file_uploader` README.
 
-This node will require the following AWS account IAM role permissions:
-- `s3:PutObject`
-for the bucket specified in the config file.
+**Amazon S3 Summary**: Amazon Simple Storage Service (Amazon S3) is an object storage service that offers industry-leading scalability, data availability, security, and performance. This means customers of all sizes and industries can use it to store and protect any amount of data for a range of use cases, such as websites, mobile applications, backup and restore, archive, enterprise applications, IoT devices, and big data analytics. Amazon S3 provides easy-to-use management features so you can organize your data and configure finely-tuned access controls to meet your specific business, organizational, and compliance requirements. Amazon S3 is designed for 99.999999999% (11 9's) of durability, and stores data for millions of applications for companies all around the world.
+
+### Build status
+
+[![Actions Status](https://github.com/aws-robotics/rosbag-uploader-ros1/workflows/build-test/badge.svg)](https://github.com/aws-robotics/rosbag-uploader-ros1/actions)
 
 
-## Usage
+## License
 
-### Resource Setup
+The source code is released under [Apache 2.0].
 
-- [Create a bucket](https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html) in Amazon S3.
-
-### Running the nodes
-
-- Build the `rosbag_cloud_recorders` package as described in the top level README.
-- Configure AWS credentials.
-- Launch the `duration_recorder` and `s3_file_uploader` nodes with
-
-        roslaunch rosbag_cloud_recorders duration_recorder_sample.launch s3_bucket:=<BUCKET_NAME>
-- OR Launch the `rolling_recorder` and `s3_file_uploader` nodes with
-
-        roslaunch rosbag_cloud_recorders rolling_recorder_sample.launch s3_bucket:=<BUCKET_NAME>
-
-More details on launch parameters below.
-
-### Example Action Client
-
-A simple example of an action client to interact with this node is provided.
-After sourcing the ROS workspace, the example client can be run with `python examples/recorder_client.py <node_type>`, where `<node_type>` can be `rolling_recorder` or `duration_recorder`.
+**Author**: AWS RoboMaker<br/>
+**Affiliation**: [Amazon Web Services (AWS)]<br/>
+**Maintainer**: AWS RoboMaker, ros-contributions@amazon.com
 
 
-## `duration_recorder` node
+## Installation
 
-### Launch and Configuration File Parameters
+### Building from Source
 
-| Name | Type | Description | Default Value |
-| ---- | ---- | ----------- | ------------- |
-| `min_free_disk_space` | int | The minimum amount of free disk space in MiB (the current action goal will be aborted when the free disk space falls below this amount) | 1024 |
-| `write_directory` | string | The local directory where rosbags will be recorded (please make sure it is a writeable directory) | ~/.ros/dr_rosbag_uploader/ |
-| `upload_timeout` | int | The time in seconds to wait for upload to complete | 3600 |
-| `delete_bags_after_upload` | bool | Whether or not the bag files should be deleted after they have been successfully uploaded | false |
+To build from source you'll need to create a new workspace, clone and checkout the `release-latest` branch of this repository, install all the dependencies, and compile. If you need the latest development features you can clone from the `master` branch instead of the latest release branch. While we guarantee the release branches are stable, __the `master` should be considered to have an unstable build__ due to ongoing development.
 
-### Actions
+- Install build tool: please refer to `colcon` [installation guide](https://colcon.readthedocs.io/en/released/user/installation.html)
 
-**Action Name**: ~/DurationRecorder
+- Create a ROS workspace and a source directory
 
-**Goal**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `destination` | string | The S3 Key prefix of the rosbag files to be uploaded |
-| `duration` | duration | The duration of time to record the rosbag for |
-| `topics_to_record` | string[] | List of topics to record (If empty, all topics will be recorded) |
+        mkdir -p ~/ros-workspace/src
 
-**Result**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `result` | uint8 | The return code associated with the goal |
-| `message` | string | A message describing the reason for the result |
+- Clone the package into the source directory . 
 
-*Note* goals also have a message field that will contain more details on the result of the action
+        cd ~/ros-workspace/src
+        git clone https://github.com/aws-robotics/rosbag-uploader-ros1.git
 
-**Feedback**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `started` | time | The time at which this feedback was published; the time of entering the current stage |
-| `stage` | uint8 | The stage of operation of the `rolling_recorder` action server |
+- Install dependencies
 
+        cd ~/ros-workspace 
+        sudo apt-get update && rosdep update
+        rosdep install --from-paths src --ignore-src -r -y
 
-## `rolling_recorder` node
+_Note: If building the master branch instead of a release branch you may need to also checkout and build the master branches of the packages this package depends on._
 
-### Launch and Configuration File Parameters
+- Build the packages
 
-| Name | Type | Description | Default Value |
-| ---- | ---- | ----------- | ------------- |
-| `bag_rollover_time` | int | The length of time in seconds to be recorded per bag file | 30 |
-| `max_record_time` | int | The length of time recordings should be kept in rosbags, which will be uploaded when requested (older rosbags will have been deleted and not be uploaded) | 300 |
-| `min_free_disk_space` | int | The minimum amount of free disk space in MiB (the node will error out when the free disk space falls below this amount) | 1024 |
-| `topics_to_record` (configuration file parameter only) | string[] | List of topics that should be recorded to rosbags | *empty* (all active topics will be recorded) |
-| `write_directory` | string | The local directory where rosbags will be recorded (please make sure it is a writeable directory) | ~/.ros/rr_rosbag_uploader/ |
-| `upload_timeout` | int | The time in seconds to wait for upload to complete | 3600 |
+        cd ~/ros-workspace && colcon build
 
-### Actions
+- Configure ROS library Path
 
-**Action Name**: ~/RollingRecorder
+        source ~/ros-workspace/install/setup.bash
 
-**Goal**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `destination` | string | The S3 Key prefix of the rosbag files to be uploaded |
+### Running Tests
 
-**Result**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `result` | uint8 | The return code associated with the goal |
-| `message` | string | A message describing the reason for the result |
+- Build with
 
-*Note* goals also have a message field that will contain more details on the result of the action
+        colcon build --cmake-targets tests
 
-**Feedback**
-| Key | Type | Description |
-| --- | ---- | ----------- |
-| `started` | time | The time at which this feedback was published; the time of entering the current stage |
-| `stage` | uint8 | The stage of operation of the `rolling_recorder` action server |
+- Then run tests
+
+        colcon test
+        colcon test-result --all
+
+### Running
+
+Instructions for running the nodes in this repository can be found in the READMEs for `rosbag_cloud_recorders` and `s3_file_uploader` packages.
 
 
-[AWS Configuration and Credential Files]: https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
+## Bugs & Feature Requests
+
+Please contact the team directly if you would like to request a feature.
+
+Please report bugs in [Issue Tracker].
+
+
+[Amazon Web Services (AWS)]: https://aws.amazon.com/
+[Apache 2.0]: https://aws.amazon.com/apache-2-0/
+[Issue Tracker]: https://github.com/aws-robotics/rosbag-uploader-ros1/issues
+[ROS]: http://www.ros.org
