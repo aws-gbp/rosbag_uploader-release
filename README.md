@@ -1,3 +1,34 @@
+## rosbag_uploader (melodic) - 1.0.0-1
+
+The packages in the `rosbag_uploader` repository were released into the `melodic` distro by running `/home/ANT.AMAZON.COM/miaofei/.local/bin/bloom-release rosbag_uploader --track melodic --rosdistro melodic -e` on `Wed, 01 Jul 2020 01:08:20 -0000`
+
+These packages were released:
+- `file_uploader_msgs`
+- `recorder_msgs`
+- `rosbag_cloud_recorders`
+- `s3_common`
+- `s3_file_uploader`
+
+These packages were explicitly ignored:
+- `rosbag_uploader_ros1_integration_tests`
+
+Version of package(s) in repository `rosbag_uploader`:
+
+- upstream repository: https://github.com/aws-robotics/rosbag-uploader-ros1.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `1.0.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.7`
+- catkin_pkg version: `0.4.22`
+- rosdep version: `0.19.0`
+- rosdistro version: `0.8.2`
+- vcstools version: `0.1.42`
+
+
 ## rosbag_uploader (kinetic) - 1.0.0-2
 
 The packages in the `rosbag_uploader` repository were released into the `kinetic` distro by running `/home/ANT.AMAZON.COM/miaofei/.local/bin/bloom-release rosbag_uploader --track kinetic --rosdistro kinetic -e` on `Wed, 01 Jul 2020 00:57:03 -0000`
