@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>s3_common</name>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <description>Common utilities for interacting with AWS S3</description>
 
   <author email="ros-contributions@amazon.com">AWS RoboMaker</author>
@@ -11,7 +11,7 @@
 
   <buildtool_depend>cmake</buildtool_depend>
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
-  
+
   <depend>aws_common</depend>
   <depend>boost</depend>
 
