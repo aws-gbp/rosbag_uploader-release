@@ -35,7 +35,9 @@ tracks:
     - git-bloom-generate -y rosdebian --prefix release/:{ros_distro} :{ros_distro}
       -i :{release_inc} --os-name debian --os-not-required
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc}
+      :{release_inc} --os-name fedora
+    - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
+      :{release_inc} --os-name rhel
     devel_branch: master
     last_version: 1.0.1
     name: upstream
@@ -45,5 +47,5 @@ tracks:
     release_tag: :{version}
     ros_distro: melodic
     vcs_type: git
-    vcs_uri: https://github.com/aws-robotics/rosbag-uploader-ros1.git
-    version: :{auto}
+    vcs_uri: https://github.com/jikawa-az/rosbag-uploader-ros1.git
+    version: 1.0.2
